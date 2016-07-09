@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{FBEC7C61-3F66-47F3-A83F-1BAE22FF1C4D}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ZFrontier</RootNamespace>
+    <AssemblyName>ZFrontier</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Logic\Events\BattleLogic.cs" />
+    <Compile Include="Logic\Events\FlightEncounters.cs" />
+    <Compile Include="Logic\SaveLoad.cs" />
+    <Compile Include="Logic\UI\ActionPanel.cs" />
+    <Compile Include="Logic\UI\Common\AreaUI_Basic.cs" />
+    <Compile Include="Logic\UI\Common\CommonMethods.cs" />
+    <Compile Include="Logic\UI\BattleStats.cs" />
+    <Compile Include="Logic\UI\EventLog.cs" />
+    <Compile Include="Logic\UI\GalaxyMap.cs" />
+    <Compile Include="Logic\UI\Windows\HelpInfo.cs" />
+    <Compile Include="Logic\UI\Windows\GalaxyInfo.cs" />
+    <Compile Include="Logic\UI\Windows\MessageBox_YesNo.cs" />
+    <Compile Include="Logic\UI\Windows\PlayerInfo.cs" />
+    <Compile Include="Logic\UI\PlayerStats.cs" />
+    <Compile Include="Logic\UI\ShopLogic.cs" />
+    <Compile Include="Logic\ZIOX.cs" />
+    <Compile Include="Logic\RNG.cs" />
+    <Compile Include="Objects\Galaxy\GlobalEvent.cs" />
+    <Compile Include="Objects\GameData\GameStructs.cs" />
+    <Compile Include="Objects\Planet\Advert.cs" />
+    <Compile Include="Objects\Units\PlayerData\CargoStorage.cs" />
+    <Compile Include="Objects\Units\PlayerData\Mission.cs" />
+    <Compile Include="Objects\Units\PlayerData\PlayerStatistics.cs" />
+    <Compile Include="Objects\Units\ShipModel.cs" />
+    <Compile Include="Objects\GameData\GameEnums.cs" />
+    <Compile Include="Objects\Units\NPC_Model.cs" />
+    <Compile Include="Objects\Units\BasicUnitModel.cs" />
+    <Compile Include="Objects\Galaxy\GalaxyModel.cs" />
+    <Compile Include="Objects\GameData\GameConfig.cs" />
+    <Compile Include="Objects\Units\PlayerModel.cs" />
+    <Compile Include="Objects\Planet\ShopItem.cs" />
+    <Compile Include="Objects\Galaxy\StarSystemModel.cs" />
+    <Compile Include="ZFrontier.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZConsole\ZConsole.csproj">
+      <Project>{e45a2faf-2d56-4ee8-8905-d3b079d14f5b}</Project>
+      <Name>ZConsole</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZLinq\ZLinq.csproj">
+      <Project>{e181fcaa-48a1-431e-a704-cab45b518e8a}</Project>
+      <Name>ZLinq</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

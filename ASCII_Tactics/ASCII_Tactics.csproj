@@ -1,0 +1,83 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{48130CB4-CCFF-45D2-929E-5333DDD45E31}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ASCII_Tactics</RootNamespace>
+    <AssemblyName>ASCII_Tactics</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="ASCII_Tactics_Game.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Logic\Extensions\ItemExtensions.cs" />
+    <Compile Include="Logic\ZIOX.cs" />
+    <Compile Include="Logic\MainGame.cs" />
+    <Compile Include="Logic\ViewLogic.cs" />
+    <Compile Include="Models\Item.cs" />
+    <Compile Include="Models\Items\Ammo.cs" />
+    <Compile Include="Models\Items\Inventory.cs" />
+    <Compile Include="Models\Items\ItemTypes.cs" />
+    <Compile Include="Models\Items\Weapon.cs" />
+    <Compile Include="Models\Team.cs" />
+    <Compile Include="Models\Unit.cs" />
+    <Compile Include="NewEngine.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ZConsole\ZConsole.csproj">
+      <Project>{e45a2faf-2d56-4ee8-8905-d3b079d14f5b}</Project>
+      <Name>ZConsole</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZFC\ZFC.csproj">
+      <Project>{E97B7EF6-30EC-4C1D-8E65-6B073D8F4BCF}</Project>
+      <Name>ZFC</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ZLinq\ZLinq.csproj">
+      <Project>{e181fcaa-48a1-431e-a704-cab45b518e8a}</Project>
+      <Name>ZLinq</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Models\Map\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
