@@ -5,6 +5,7 @@
 	using Objects.Units;
 	using Objects.Units.PlayerData;
 	using ZConsole;
+	using ZConsole.Table;
 
 
 	public static class PlayerInfo
@@ -43,17 +44,17 @@
 
 		private static void		DrawTable()
 		{
-			ZTable.DrawTable(TableRect.Left, TableRect.Top, new ZTable.Table(TableRect.Width, TableRect.Height) 
+			ZTable.DrawTable(TableRect.Left, TableRect.Top, new Table(TableRect.Width, TableRect.Height) 
 				{
 					Caption = "Table",
-					Borders = new ZTable.FrameBorders(FrameType.Double),
+					Borders = new FrameBorders(FrameType.Double),
 					BorderColors = new ZCharAttribute(Color.Cyan, BackColor),
 					FillColors = new ZCharAttribute(Color.Cyan, BackColor), 
 					Cells = new []
 						{
-							new ZTable.Cell(MissionsCell),
-							new ZTable.Cell(KillsCell),
-							new ZTable.Cell(StatusesCell)
+							new Cell(MissionsCell),
+							new Cell(KillsCell),
+							new Cell(StatusesCell)
 						}
 				});
 		}

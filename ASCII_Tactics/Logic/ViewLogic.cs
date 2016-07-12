@@ -81,13 +81,17 @@
 		public void				TurnLeft(int times = 1)
 		{
 			for (var i = 0; i < times; i++)
+			{
 				Direction = Direction > 0 ? Direction - 1 : 7;
+			}
 		}
 		
 		public void				TurnRight(int times = 1)
 		{
 			for (var i = 0; i < times; i++)
+			{
 				Direction = Direction < 7 ? Direction + 1 : 0;
+			}
 		}
 
 		#endregion

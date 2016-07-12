@@ -1,7 +1,8 @@
-﻿namespace ZConsole 
+﻿namespace ZConsole
 {
 	using System;
 	using System.Collections.Generic;
+	using Table;
 
 
 	public static class ZTable
@@ -56,9 +57,9 @@
 		}
 
 
-		public static void	DrawTable(int x, int y, Table table)
+		public static void	DrawTable(int x, int y, Table.Table table)
 		{
-			table.validate();
+			table._validate();
 
 			var width  = table.Dimensions.Width;
 			var height = table.Dimensions.Height;
@@ -106,6 +107,7 @@
 			HighlightCell(rect.Left, rect.Top, rect.Right, rect.Bottom, foreColor, backColor);
 		}
 		
+
 		private static void putFrameIntoBuffer(Node[,] buffer, Rect dimensions, FrameBorders borders, ZCharAttribute? borderColors, ZCharAttribute? fillColors)
 		{
 			currentBuffer = buffer;
@@ -177,75 +179,6 @@
 		{
 			internal NodeEnum		NodeEnumItem;
 			internal ZCharAttribute Colors;
-		}
-
-
-		public class Table
-		{
-			public Size				Dimensions		{ get; set; }
-			public FrameBorders		Borders			{ get; set; }
-			public ZCharAttribute?	BorderColors	{ get; set; }
-			public ZCharAttribute?	FillColors		{ get; set; }
-			public Cell[]			Cells			{ get; set; }
-			public string			Caption			{ get; set; }
-			public bool				UseCellBordersForOuterBorder { get; set; }
-
-			internal void validate()
-			{
-				foreach (var cell in Cells)
-				{
-					cell.BorderColors	= cell.BorderColors ?? BorderColors;
-					cell.FillColors		= cell.FillColors	?? FillColors;
-					cell.Dimensions.Right  = Math.Min(cell.Dimensions.Right,  Dimensions.Width - 1);
-					cell.Dimensions.Bottom = Math.Min(cell.Dimensions.Bottom, Dimensions.Height - 1);
-				}
-			}
-
-			public Table(int width, int height)
-			{
-				Dimensions	= new Size(width, height);
-				Borders	= new FrameBorders();
-				Cells	= new Cell[0];
-			}
-		}
-
-		public class Cell
-		{
-			public Rect				Dimensions		{ get; set; }
-			public FrameBorders		Borders			{ get; set; }
-			public ZCharAttribute?	BorderColors	{ get; set; }
-			public ZCharAttribute?	FillColors		{ get; set; }
-			public string			Caption			{ get; set; }
-
-
-			public Cell(int left, int top, int right, int bottom)
-			{
-				Dimensions	= new Rect(left, top, right, bottom);
-				Borders		= new FrameBorders();
-			}
-
-			public Cell(Rect rect)
-			{
-				Dimensions	= rect;
-				Borders		= new FrameBorders();
-			}
-		}
-	
-		public class FrameBorders
-		{
-			public FrameType	TopBorder			{ get; set; }
-			public FrameType	BottomBorder		{ get; set; }
-			public FrameType	LeftBorder			{ get; set; }
-			public FrameType	RightBorder			{ get; set; }
-
-			public FrameBorders() : this(FrameType.Single)
-			{
-			}
-
-			public FrameBorders(FrameType allBordersType)
-			{
-				TopBorder = BottomBorder = LeftBorder = RightBorder = allBordersType;
-			}
-		}
+		}		
 	}	
 }

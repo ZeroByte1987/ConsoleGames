@@ -2,6 +2,7 @@
 {
 	using System;
 	using ZConsole;
+	using ZConsole.Table;
 
 
 	public class Map_Editor
@@ -27,15 +28,15 @@
 
 		private static void		DrawUI()
 		{
-			ZTable.DrawTable(0, 0, new ZTable.Table(xTotalScreenSize-1, yTotalScreenSize) 
+			ZTable.DrawTable(0, 0, new Table(xTotalScreenSize-1, yTotalScreenSize) 
 				{
 					Caption = "Table",
-					Borders = new ZTable.FrameBorders(FrameType.Double)  { LeftBorder = FrameType.Single },
+					Borders = new FrameBorders(FrameType.Double)  { LeftBorder = FrameType.Single },
 					BorderColors = new ZCharAttribute(Color.Cyan, Color.Black),
 					Cells = new []
 						{
-							new ZTable.Cell(0,  0,  xEditAreaSize+1, yTotalScreenSize) { Borders = new ZTable.FrameBorders(FrameType.Double) },
-							new ZTable.Cell(xEditAreaSize+1, 25,  xTotalScreenSize,  yTotalScreenSize)
+							new Cell(0,  0,  xEditAreaSize+1, yTotalScreenSize) { Borders = new FrameBorders(FrameType.Double) },
+							new Cell(xEditAreaSize+1, 25,  xTotalScreenSize,  yTotalScreenSize)
 						}
 				});
 		}

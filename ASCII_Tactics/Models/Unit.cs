@@ -155,6 +155,23 @@
 			ZBuffer.WriteBuffer("InfoBuffer", Config.InfoAreaSizeX.Min, Config.InfoAreaSizeY.Min);
 		}
 
+		public void		DrawTargetInfo()
+		{
+			ZIOX.OutputType = ZIOX.OutputTypeEnum.Buffer;
+			ZIOX.BufferName = "TargetInfoBuffer";
+			var area = Config.UnitStatsArea;
+			
+			ZIOX.Draw_Stat(area, 0, "Name",		Name);
+			ZIOX.Draw_Stat(area, 1, "Health", 	ZIOX.Draw_State, CurrentHP, MaxHP, true);
+			ZIOX.Draw_Stat(area, 2, "TU", 		ZIOX.Draw_State, CurrentTU, MaxTU, true);
+			ZIOX.Draw_Stat(area, 3, "Crouch",	IsSitting.ToString());
+			
+			ZIOX.Draw_Stat(area, 5, "In hands",	CurrentItem.Name);
+			
+			ZBuffer.WriteBuffer("TargetInfoBuffer", Config.TargetInfoAreaSizeX.Min, Config.TargetInfoAreaSizeY.Min);
+			ZIOX.OutputType = ZIOX.OutputTypeEnum.Direct;
+		}		
+
 		#endregion
 
 		#region Constructors

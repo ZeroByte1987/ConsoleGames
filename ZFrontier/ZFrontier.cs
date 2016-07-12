@@ -11,6 +11,7 @@
 	using Objects.Units;
 	using Objects.Units.PlayerData;
 	using ZConsole;
+	using ZConsole.Table;
 	using ZLinq;
 
 
@@ -283,19 +284,19 @@
 
 		private static void		Draw_Interface()
 		{
-			ZTable.DrawTable(0, 0, new ZTable.Table(xTotalScreenSize-1, yTotalScreenSize) 
+			ZTable.DrawTable(0, 0, new Table(xTotalScreenSize-1, yTotalScreenSize) 
 				{
 					Caption = "Table",
-					Borders = new ZTable.FrameBorders(FrameType.Double),
+					Borders = new FrameBorders(FrameType.Double),
 					BorderColors = new ZCharAttribute(Color.Cyan, Color.Black),
 					Cells = new []
 						{
-							new ZTable.Cell(EventAreaCell),
-							new ZTable.Cell(GalaxyAreaCell),
-							new ZTable.Cell(ActionAreaCell),
-							new ZTable.Cell(PlayerStatsAreaCell),
-							new ZTable.Cell(xEventAreaSize+xPlayerStatsSize, yControlDivider, xTotalScreenSize, yTotalScreenSize),
-							new ZTable.Cell(xEventAreaSize+xPlayerStatsSize, yReleaseInfo,    xTotalScreenSize, yTotalScreenSize)
+							new Cell(EventAreaCell),
+							new Cell(GalaxyAreaCell),
+							new Cell(ActionAreaCell),
+							new Cell(PlayerStatsAreaCell),
+							new Cell(xEventAreaSize+xPlayerStatsSize, yControlDivider, xTotalScreenSize, yTotalScreenSize),
+							new Cell(xEventAreaSize+xPlayerStatsSize, yReleaseInfo,    xTotalScreenSize, yTotalScreenSize)
 						}
 				});
 		}

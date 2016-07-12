@@ -3,6 +3,7 @@
 	using System;
 	using Objects.GameData;
 	using ZConsole;
+	using ZConsole.Table;
 	using ZLinq;
 
 
@@ -31,10 +32,10 @@
 
 		private static void		DrawTable()
 		{
-			ZTable.DrawTable(TableRect.Left, TableRect.Top, new ZTable.Table(TableRect.Width, GameConfig.CurrentGalaxySizeX*GameConfig.CurrentGalaxySizeY + 4)
+			ZTable.DrawTable(TableRect.Left, TableRect.Top, new Table(TableRect.Width, GameConfig.CurrentGalaxySizeX*GameConfig.CurrentGalaxySizeY + 4)
 				{
 					Caption = "Table",
-					Borders = new ZTable.FrameBorders(FrameType.Double),
+					Borders = new FrameBorders(FrameType.Double),
 					BorderColors = new ZCharAttribute(Color.Cyan, BackColor),
 					FillColors = new ZCharAttribute(Color.Cyan, BackColor), 
 				});

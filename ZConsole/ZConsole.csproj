@@ -38,6 +38,14 @@
   <ItemGroup>
     <Compile Include="Common.cs" />
     <Compile Include="Common\ZFile.cs" />
+    <Compile Include="Frame\ZFrame.ColorScheme.cs" />
+    <Compile Include="Frame\ZFrame.Options.cs" />
+    <Compile Include="Menu\ZMenu.MenuItem.cs" />
+    <Compile Include="Menu\ZMenu.Options.cs" />
+    <Compile Include="Menu\ZMenu.ColorScheme.cs" />
+    <Compile Include="Table\Cell.cs" />
+    <Compile Include="Table\FrameBorders.cs" />
+    <Compile Include="Table\Table.cs" />
     <Compile Include="ZConsoleMain.cs" />
     <Compile Include="ZCursor.cs" />
     <Compile Include="ZColors.cs" />
@@ -49,10 +57,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Common\ZConfig.cs" />
     <Compile Include="ZBuffer.cs" />
-    <Compile Include="ZFrame.cs" />
-    <Compile Include="ZMenu.cs" />
+    <Compile Include="Frame\ZFrame.cs" />
+    <Compile Include="Menu\ZMenu.cs" />
     <Compile Include="ZMessageLog.cs" />
-    <Compile Include="ZTable.cs" />
+    <Compile Include="Table\ZTable.cs" />
     <Compile Include="ZUI.cs" />
   </ItemGroup>
   <ItemGroup>

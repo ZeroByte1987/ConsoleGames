@@ -7,6 +7,7 @@
 	using Models.Items;
 	using ZConsole;
 	using ZConsole.LowLevel;
+	using ZConsole.Table;
 	using ZLinq;
 
 
@@ -24,12 +25,15 @@
 
 		public void		DrawUI()
 		{
-			ZTable.DrawTable(0, 0, new ZTable.Table(Config.WindowSizeX, Config.WindowSizeY)
+			ZTable.DrawTable(0, 0, new Table(Config.WindowSizeX, Config.WindowSizeY)
 				{
-					Caption = "Table",
-					Borders = new ZTable.FrameBorders(FrameType.Double),
+					Borders = new FrameBorders(FrameType.Double),
 					BorderColors = new ZCharAttribute(Color.Cyan, Color.Black),
-					Cells = new [] { new ZTable.Cell(Config.GameAreaSizeX.Max+1, 0, Config.WindowSizeX, Config.WindowSizeY) }
+					Cells = new []
+						{
+							new Cell(Config.GameAreaSizeX.Max+1,  0, Config.WindowSizeX, 30),
+							new Cell(Config.GameAreaSizeX.Max+1, 30, Config.WindowSizeX, Config.WindowSizeY)
+						}
 				});
 		}
 
@@ -102,60 +106,73 @@
 
 				var input = ZInput.ReadInput();
 				var key = input.KeyEvent;
-				var mouse = input.MouseEvent;
 
 				if (input.EventType == ConsoleInputEventType.KeyEvent  &&  key.IsKeyDown)
 				{
 					switch (key.VirtualKeyCode)
 					{
+						case ConsoleKey.Escape		:	exitFlag = true;				break;
 						case ConsoleKey.LeftArrow	:	CurrentUnit.TurnLeft();			break;
 						case ConsoleKey.RightArrow	:	CurrentUnit.TurnRight();		break;
 						case ConsoleKey.UpArrow		:	CurrentUnit.Move(1);			break;
 						case ConsoleKey.DownArrow	:	CurrentUnit.Move(-1);			break;
 						case ConsoleKey.PageDown	:	CurrentUnit.ChangeState(true);	break;
 						case ConsoleKey.PageUp		:	CurrentUnit.ChangeState(false);	break;
-
-						case ConsoleKey.Enter		:	DoAction();			break;
+						case ConsoleKey.Enter		:	DoAction();						break;
 
 						case ConsoleKey.Tab			:	
 							CurrentUnit.Draw();
 							CurrentUnitIndex = CurrentUnitIndex < CurrentTeam.Units.Count-1 ? CurrentUnitIndex + 1 : 0;	break;
-
-						case ConsoleKey.Escape		:	exitFlag = true;	break;
 					}
 				}
 
-
 				if (input.EventType == ConsoleInputEventType.MouseEvent)
 				{
-					if (mouse.ButtonState == ConsoleMouseButtonState.LeftButtonPressed)
-					{
-						for (var i = 0; i < CurrentTeam.Units.Count; i++)
-						{
-							var unit = CurrentTeam.Units[i];
-							if (unit.XPos == mouse.MousePosition.X-1  &&  unit.YPos == mouse.MousePosition.Y-1)
-							{
-								CurrentUnit.Draw();
-								CurrentUnitIndex = i;
-							}
-						}
-					}
-
-					if (mouse.ButtonState == ConsoleMouseButtonState.RightButtonPressed)
-					{
-						for (var i = 0; i < CurrentTeam.Units.Count; i++)
-						{
-							var unit = CurrentTeam.Units[i];
-							if (unit.XPos == mouse.MousePosition.X-1  &&  unit.YPos == mouse.MousePosition.Y-1)
-							{
-								Shoot(new Coord(unit.XPos, unit.YPos));
-							}
-						}
-					}
+					ProcessMouseEvent(input.MouseEvent);
 				}
 			}
 		}
 
+
+		private void	ProcessMouseEvent(ConsoleMouseEventInfo mouse)
+		{
+			HideTargetInfo();
+			for (var i = 0; i < CurrentTeam.Units.Count; i++)
+			{
+				var unit = CurrentTeam.Units[i];
+				if (unit.XPos == mouse.MousePosition.X-1  &&  unit.YPos == mouse.MousePosition.Y-1)
+				{
+					unit.DrawTargetInfo();
+				}
+			}
+
+			//	Choose a unit
+			if (mouse.ButtonState == ConsoleMouseButtonState.LeftButtonPressed)
+			{
+				for (var i = 0; i < CurrentTeam.Units.Count; i++)
+				{
+					var unit = CurrentTeam.Units[i];
+					if (unit.XPos == mouse.MousePosition.X-1  &&  unit.YPos == mouse.MousePosition.Y-1)
+					{
+						CurrentUnit.Draw();
+						CurrentUnitIndex = i;
+					}
+				}
+			}
+
+			//	Select a target
+			if (mouse.ButtonState == ConsoleMouseButtonState.RightButtonPressed)
+			{
+				for (var i = 0; i < CurrentTeam.Units.Count; i++)
+				{
+					var unit = CurrentTeam.Units[i];
+					if (unit.XPos == mouse.MousePosition.X-1  &&  unit.YPos == mouse.MousePosition.Y-1)
+					{
+						Shoot(new Coord(unit.XPos, unit.YPos));
+					}
+				}
+			}
+		}
 
 		public void		DoAction()
 		{
@@ -234,6 +251,11 @@
 					if (target.X == unit.XPos  &&  target.Y == unit.YPos)
 						return true;
 			return false;
+		}
+
+		private void	HideTargetInfo()
+		{
+			ZOutput.FillRect(Config.TargetInfoAreaSizeX.Min, Config.TargetInfoAreaSizeY.Min, Config.TargetInfoAreaSizeX.RangeValue-1, Config.TargetInfoAreaSizeY.RangeValue-1, ' ');
 		}
 
 

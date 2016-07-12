@@ -1,9 +1,7 @@
 ﻿namespace ZConsole
 {
-	public static class ZFrame
+	public static partial class ZFrame
 	{
-		#region Private Consts and Default Values
-
 		private static readonly string[] frameCharSets = new []
 			{
 				"        ",
@@ -12,11 +10,9 @@
 				"┌─┐││└─┘"
 			};
 
-		public static readonly ColorScheme	DefaultColorScheme = new ColorScheme();
+		private static readonly ColorScheme	defaultColorScheme = new ColorScheme();
 
-		#endregion
 
-		#region =====  Public Methods   =====
 
 		public static void		DrawFrame(int x, int y, int width, int height)
 		{
@@ -35,9 +31,7 @@
 			ZColors.RestoreColors();
 		}
 
-		#endregion
 
-		#region =====  Private Methods  =====
 
 		private static void		_drawFrame(int x, int y, int width, int height, FrameType frameType, bool isFilled, string caption, Color captionColor = Color.White, Color captionBackColor = Color.Black)
 		{
@@ -71,77 +65,5 @@
 		{
 			return (frameType < 0) ? 0 : (frameType > FrameType.Custom) ? FrameType.Custom : frameType;
 		}
-
-		#endregion
-
-		#region Option SubClasses and Enums
-
-		public class	ColorScheme
-		{
-			public Color FrameForeColor			{ get; set; }
-			public Color FrameBackColor			{ get; set; }
-		
-			public Color CaptionForeColor		{ get; set; }
-			public Color CaptionBackColor		{ get; set; }
-
-			public ColorScheme()
-			{
-				FrameBackColor		= Color.Black;
-				FrameForeColor		= Color.Yellow;
-				CaptionBackColor	= Color.Black;
-				CaptionForeColor	= Color.Magenta;
-			}
-		}
-
-		public class	Options
-		{
-			#region Private Fields and Constructor
-
-			private FrameType	_frameType;
-			private int			_width;
-			private int			_height;
-
-			public Options()
-			{
-				ColorScheme		= DefaultColorScheme;
-				FrameType		= FrameType.Single;
-				Width			= 0;
-				Height			= 0;
-				Caption			= null;
-				IsFilled		= false;
-			}
-
-			#endregion		
-
-			#region Public Properties
-
-			public string		Caption { get; set; }
-
-			public int			Width
-			{
-				get { return _width; }
-				set { _width = (value < 5) ? 5 : value; }
-			}
-
-			public int			Height
-			{
-				get { return _height; }
-				set { _height = (value < 3) ? 3 : value; }
-			}
-
-			public ColorScheme	ColorScheme	{ get; set; }
-
-			public FrameType	FrameType
-			{
-				get { return _frameType; }
-				set { _frameType = _validate(value); }
-			}
-
-			public bool			IsFilled { get; set; }
-
-			#endregion
-		}
-
-		#endregion
 	}
 }

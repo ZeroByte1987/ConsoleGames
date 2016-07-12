@@ -31,7 +31,7 @@
 
 		static void DrawMainMenu()
 		{
-			string result = null;
+			string result;
 			do 
 			{
 				result = ZMenu.GetMenuResult(50, 6,
