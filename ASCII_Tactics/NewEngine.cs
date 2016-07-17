@@ -1,6 +1,8 @@
 ﻿namespace ASCII_Tactics
 {
+	using Config;
 	using Logic;
+	using Logic.Map;
 	using ZConsole;
 
 
@@ -8,19 +10,21 @@
 	{
 		private static void		PrepareGraphicMode()
 		{
-			ZConsoleMain.Initialize(Config.WindowSizeX+1, Config.WindowSizeY);
+			ZConsoleMain.Initialize(UIConfig.WindowSize.Width+1, UIConfig.WindowSize.Height);
 			ZCursor.SetCursorVisibility(false);
-			ZBuffer.CreateBuffer("defaultBuffer",		Config.GameAreaSizeX.Max,					Config.GameAreaSizeY.Max);
-			ZBuffer.CreateBuffer("InfoBuffer",			Config.InfoAreaSizeX.RangeValue-1,			Config.InfoAreaSizeY.RangeValue);
-			ZBuffer.CreateBuffer("TargetInfoBuffer",	Config.TargetInfoAreaSizeX.RangeValue-1,	Config.TargetInfoAreaSizeY.RangeValue);
+			ZBuffer.CreateBuffer("defaultBuffer",		UIConfig.GameAreaRect.Size);
+			ZBuffer.CreateBuffer("InfoBuffer",			UIConfig.UnitInfoRect.Size);
+			ZBuffer.CreateBuffer("TargetInfoBuffer",	UIConfig.TargetInfoRect.Size);
 		}
 
 		
 		private static void		Main()
 		{
 			PrepareGraphicMode();
-			
-			var mainGame = new MainGame();
+
+			//LevelsShowRoom.ShowStation();
+
+			var mainGame = new MainGame();			
 			mainGame.InitializeGame();
 			mainGame.MainGameLoop();
 		}

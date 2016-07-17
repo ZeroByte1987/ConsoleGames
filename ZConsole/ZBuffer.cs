@@ -66,6 +66,18 @@
         /// Writes character and attribute information to a rectangular portion of the screen buffer.
         /// </summary>
         /// <param name="bufferName">Name of the buffer to write from.</param>
+        /// <param name="topLeft">Column/row position of the top-left corner of the screen buffer area where characters are to be written.</param>
+		public static void		WriteBuffer(string bufferName, Coord topLeft)
+		{
+			CheckBuffer(bufferName);
+			var buffer = buffers[bufferName];
+			WriteBuffer(bufferName, 0, 0, topLeft.X, topLeft.Y, topLeft.X + buffer.GetLength(1)-1, topLeft.Y + buffer.GetLength(0)-1);
+		}
+
+		/// <summary>
+        /// Writes character and attribute information to a rectangular portion of the screen buffer.
+        /// </summary>
+        /// <param name="bufferName">Name of the buffer to write from.</param>
         /// <param name="left">Column position of the top-left corner of the screen buffer area where characters are to be written.</param>
         /// <param name="top">Row position of the top-left corner of the screen buffer area where characters are to be written.</param>
 		public static void		WriteBuffer(string bufferName, int left, int top)
@@ -123,6 +135,11 @@
 			return resultBuffer;
 		}
 
+
+		public static void		CreateBuffer(string bufferName, Size size)
+		{
+			CreateBuffer(bufferName, size.Width, size.Height);
+		}
 
 		public static void		CreateBuffer(string bufferName, int width, int height)
 		{

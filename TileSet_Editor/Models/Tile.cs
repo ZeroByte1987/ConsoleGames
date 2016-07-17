@@ -70,6 +70,6 @@
 
 		public bool		IsPassable		{	get {	return bitArray[0]; }	set {	bitArray[0] = value;	}}
 		public bool		IsTransparent	{	get {	return bitArray[1]; }	set {	bitArray[1] = value;	}}	
-		public bool		IsDestructible	{	get {	return bitArray[2]; }	set {	bitArray[2] = value;	}}	
+		public bool		IsDestructible	{	get {	return bitArray[2]; }	set {	bitArray[2] = value;	}}
 	}
 }

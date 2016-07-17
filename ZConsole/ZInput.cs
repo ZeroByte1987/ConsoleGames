@@ -58,6 +58,19 @@
 			}
 		}
 
+
+		public static ConsoleInput		WaitForInput()
+		{
+			while (true)
+			{
+				var input = ReadInput();
+				if (input.EventType == ConsoleInputEventType.KeyEvent  ||  input.EventType == ConsoleInputEventType.MouseEvent)
+				{
+					return input;
+				}
+			}
+		}
+
 		public static ConsoleInput		ReadInput()
 		{
 			var result = new ConsoleInput[1];
@@ -65,6 +78,7 @@
 			WinCon.ReadConsoleInput(hConsoleInput, result, 1, ref resultCount);
 			return result[0];
 		}
+
 
 		public static ConsoleKey		ReadKey()
 		{

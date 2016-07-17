@@ -52,6 +52,11 @@
 		}
 
 
+		public static void		Initialize(Size consoleSize)
+		{
+			Initialize(consoleSize.Width, consoleSize.Height);
+		}
+
 		public static void		Initialize(int xConsoleSize, int yConsoleSize)
 		{
 			Initialize();

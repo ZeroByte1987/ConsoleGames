@@ -117,17 +117,21 @@
 
 	public class		Rect
 	{
-		public int	Left	{ get; set; }
-		public int	Top		{ get; set; }
-		public int	Right	{ get; set; }
-		public int	Bottom	{ get; set; }
+		public int		Left		{ get; set; }
+		public int		Top			{ get; set; }
+		public int		Right		{ get; set; }
+		public int		Bottom		{ get; set; }
+
+		public Coord	TopLeft		{ get { return new Coord(Left, Top);	 }}
+		public Coord	BottomRight	{ get { return new Coord(Right, Bottom); }}
+		public Size		Size		{ get { return new Size(Width, Height);  }}
 
 		public Rect(int left, int top, int right, int bottom)
 		{
-			Left	= left;
-			Top		= top;
-			Right	= right;
-			Bottom	= bottom;
+			Left	= left < right ? left : right;
+			Top		= top < bottom ? top : bottom;
+			Right	= right > left ? right : left;
+			Bottom	= bottom > top ? bottom : top;
 		}
 
 		/// <summary>

@@ -1,72 +1,65 @@
 ﻿namespace ASCII_Tactics.Models
 {
 	using System;
+	using CommonEnums;
+	using Config;
 	using Items;
 	using Logic;
 	using Logic.Extensions;
+	using Map;
+	using Tiles;
+	using UnitData;
 	using ZConsole;
-	using ZFC.Maths;
 	using ZLinq;
 
 
 	public class Unit
 	{
-		#region Public Properties
-
 		public int			Id				{ get; set; }
 		public string		Name			{ get; set; }
-		public int			XPos			{ get; set; }
-		public int			YPos			{ get; set; }
-		public bool			IsSitting		{ get; set; }
-
-		public int			MaxHP			{ get; set; }
-		public int			CurrentHP		{ get; set; }
-	
-		public int			InitialMaxTU	{ get; set; }
-		public int			MaxTU			{ get { return InitialMaxTU/2 + (InitialMaxTU/2)*(CurrentHP/MaxHP); }}
-		public int			CurrentTU		{ get; set; }
-
-		public int			InitialAccuracy	{ get; set; }
-		public int			Accuracy		{ get { return InitialAccuracy/2 + (InitialAccuracy/2)*(CurrentHP/MaxHP); }}
 		
-		public int			Strength		{ get; set; }
-		public int			MaxWeight		{ get { return Strength + Strength*(CurrentHP/MaxHP); }}
+		public Position		Position		{ get; set; }
+		public UnitStats	Stats			{ get; set; }
 
 		public Inventory	Inventory		{ get; set; }
 		public Item			CurrentItem		{ get { return Inventory.CurrentItem; }}
 
 		public ViewLogic	View			{ get; set; }
+		public Level		CurrentLevel	{ get { return MainGame.SpaceStation.Levels.SingleOrDefault(w => w.Id == Position.LevelId); }}
 
 		public Team			Team			{ get; set; }
 
-		#endregion
+
+		public Unit(string name, int levelId, int xPos, int yPos)
+		{
+			Name		= name;
+			Position	= new Position(levelId, xPos, yPos);
+		}
+
 
 		#region Public Methods
 
 		public bool		Move(int dx, int dy)
 		{
 			var moveTimeCost = Math.Abs(dx+dy) == 1 ? 2 : 3;
-			if (CurrentTU < moveTimeCost)
+			if (Stats.CurrentTU < moveTimeCost)
 				return false;
+			
+			var newPosX = Position.X + dx;
+			var newPosY = Position.Y + dy;
 
-			var newPosX = XPos + dx;
-			var newPosY = YPos + dy;
+			if (!CurrentLevel.Map[newPosY, newPosX].Type.IsPassable)
+				return false;
 
 			foreach (var team in MainGame.Teams)
 				foreach (var unit in team.Units)
-					if (newPosX == unit.XPos  &&  newPosY == unit.YPos)
+					if (newPosX == unit.Position.X  &&  newPosY == unit.Position.Y)
 						return false;
 
-			if (ZMath.IsInRange(newPosX, 0, ZConsoleMain.WindowSize.Width)  
-		     && ZMath.IsInRange(newPosY, 0, ZConsoleMain.WindowSize.Height))
-			{
-				XPos = newPosX;
-				YPos = newPosY;
-				CurrentTU -= moveTimeCost;
-				return true;
-			}
-
-			return false;
+			Position.X = newPosX;
+			Position.Y = newPosY;
+			Stats.CurrentTU -= moveTimeCost;
+			return true;
 		}
 
 		public bool		Move(int dx)
@@ -76,75 +69,133 @@
 
 		public void		TurnLeft()
 		{
-			if (CurrentTU > 0)
+			if (Stats.CurrentTU > 0)
 			{
 				View.TurnLeft();
-				CurrentTU--;
+				Stats.CurrentTU--;
 			}
 		}
 		
-		public void		TurnRight(int times = 1)
+		public void		TurnRight()
 		{
-			if (CurrentTU > 0)
+			if (Stats.CurrentTU > 0)
 			{
 				View.TurnRight();
-				CurrentTU--;
+				Stats.CurrentTU--;
+			}
+		}
+		
+		public void		ChangeState(bool toSit)
+		{
+			if (Stats.CurrentTU >= 4  &&  Position.IsSitting != toSit)
+			{
+				Position.IsSitting = toSit;
+				Stats.CurrentTU -= 4;
 			}
 		}
 
-		public void		ChangeState(bool toSit)
+
+		public void		DoAction()
 		{
-			if (CurrentTU >= 4  &&  IsSitting != toSit)
+			var tile = CurrentLevel.Map[Position.Y + View.DY, Position.X + View.DX];
+
+			if (tile.Type.Role == TileRole.Door)
 			{
-				IsSitting = toSit;
-				CurrentTU -= 4;
+				CurrentLevel.Map[Position.Y + View.DY, Position.X + View.DX] = tile.Type.Name == "OpenedDoor"
+					? new Tile("ClosedDoor")
+					: new Tile("OpenedDoor");
 			}
 		}
 
 
 		public void		DrawVisibleTerrain()
 		{
-			for (var i = 0; i < Config.GameAreaSizeY.Max-1; i++)
-				for (var j = 0; j < Config.GameAreaSizeX.Max-1; j++)
-					ZIOX.Print(j, i, ".", View.IsPointVisible(XPos, YPos, j, i) ? Color.DarkGray : Color.Black);
+			var sizeX = MapConfig.LevelSize.Width;
+			var sizeY = MapConfig.LevelSize.Height;
+			var level = CurrentLevel;
+			var map = level.Map;
+			var viewMap1 = new int[sizeY, sizeX];
+			var viewMap2 = new int[sizeY, sizeX];
+			
+			for (var y = 0; y < sizeY; y++)
+				for (var x = 0; x < sizeX; x++)
+					if (View.IsPointVisible(level, Position, x, y, Position.IsSitting))
+						viewMap1[y, x] = 1;
+
+			for (var y = 0; y < sizeY; y++)
+				for (var x = 0; x < sizeX; x++)
+				{
+					var tile = map[y, x].Type;
+
+					if (tile.Size != ObjectSize.FullTile)
+						continue;
+
+					for (var i = -1; i <= 1; i++)
+						for (var j = -1; j <= 1; j++)
+						{
+							var x1 = x + j;
+							var y1 = y + i;
+							
+							if (y1 >= 0  &&  y1 < sizeY  &&  x1 >= 0  &&  x1 < sizeX  &&
+								viewMap1[y1, x1] == 1  &&  map[y1, x1].Type.Height == ObjectHeight.None)
+							{
+								viewMap2[y, x] = 1;
+								break;
+							}
+						}
+				}
+
+			for (var y = 0; y < sizeY; y++)
+				for (var x = 0; x < sizeX; x++)
+					if (viewMap1[y, x] == 1  ||  viewMap2[y, x] == 1)
+					{
+						var tile = map[y, x].Type;
+						ZIOX.Print(x, y, tile.Character, tile.ForeColor, tile.BackColor);
+					}
+					else
+					{
+						ZIOX.Print(x, y, ' ', Color.Black);
+					}
 		}
+
 
 		public void		DrawVisibleUnits()
 		{
 			foreach (var team in MainGame.Teams)
 				foreach (var unit in team.Units.Where(a => a.Name != Name))
-					if (View.IsPointVisible(XPos, YPos, unit.XPos, unit.YPos))
-						ZIOX.Print(unit.XPos, unit.YPos, "@", (team.Name == Team.Name) ? Color.Magenta : Color.Red);
+					if (View.IsPointVisible(CurrentLevel, Position, unit.Position))
+						ZIOX.Print(unit.Position.X, unit.Position.Y, "@", (team.Name == Team.Name) ? Color.Magenta : Color.Red);
 		}
+
 
 		public void		Draw()
 		{
 			ZIOX.OutputType = ZIOX.OutputTypeEnum.Buffer;
-
 			ZIOX.BufferName = "defaultBuffer";
+
 			DrawVisibleTerrain();
 			DrawVisibleUnits();
 
-			ZBuffer.PrintToBuffer(XPos, YPos, '@', Color.Yellow);
-			ZBuffer.WriteBuffer("defaultBuffer", Config.GameAreaSizeX.Min, Config.GameAreaSizeY.Min);
-			
+			ZBuffer.PrintToBuffer(Position.X, Position.Y, '@', Color.Yellow);
+			ZBuffer.WriteBuffer("defaultBuffer", UIConfig.GameAreaRect.Left, UIConfig.GameAreaRect.Top);
 			
 			DrawInfo();
 
 			ZIOX.OutputType = ZIOX.OutputTypeEnum.Direct;
 		}
 
+
 		public void		DrawInfo()
 		{
 			ZIOX.BufferName = "InfoBuffer";
-			var area = Config.UnitStatsArea;
+			var area = UIConfig.UnitStatsArea;
 			
 			ZIOX.Draw_Stat(area, 0, "Name",		Name);
-			ZIOX.Draw_Stat(area, 1, "Health", 	ZIOX.Draw_State, CurrentHP, MaxHP, true);
-			ZIOX.Draw_Stat(area, 2, "TU", 		ZIOX.Draw_State, CurrentTU, MaxTU, true);
-			ZIOX.Draw_Stat(area, 3, "Crouch",	IsSitting.ToString());
-			ZIOX.Draw_Stat(area, 5, "Accuracy",	Accuracy);
-			ZIOX.Draw_Stat(area, 6, "Strength",	Strength);
+			ZIOX.Draw_Stat(area, 1, "Health", 	ZIOX.Draw_State, Stats.CurrentHP, Stats.MaxHP, true);
+			ZIOX.Draw_Stat(area, 2, "TU", 		ZIOX.Draw_State, Stats.CurrentTU, Stats.MaxTU, true);
+			ZIOX.Draw_Stat(area, 3, "Crouch",	Position.IsSitting.ToString());
+			ZIOX.Draw_Stat(area, 5, "Accuracy",	Stats.CurrentAccuracy);
+			ZIOX.Draw_Stat(area, 6, "Strength",	Stats.CurrentStrength);
 			
 			ZIOX.Draw_Stat(area, 8, "In hands",	CurrentItem.Name);
 			var ammo = Inventory.First(item => item.Name == CurrentItem.Name + " Ammo");
@@ -152,36 +203,25 @@
 
 			Inventory.Draw(area, 11);			
 			
-			ZBuffer.WriteBuffer("InfoBuffer", Config.InfoAreaSizeX.Min, Config.InfoAreaSizeY.Min);
+			ZBuffer.WriteBuffer("InfoBuffer", UIConfig.UnitInfoRect.Left, UIConfig.UnitInfoRect.Top);
 		}
 
-		public void		DrawTargetInfo()
+		public void		DrawInfoAsTarget()
 		{
 			ZIOX.OutputType = ZIOX.OutputTypeEnum.Buffer;
 			ZIOX.BufferName = "TargetInfoBuffer";
-			var area = Config.UnitStatsArea;
+			var area = UIConfig.UnitStatsArea;
 			
 			ZIOX.Draw_Stat(area, 0, "Name",		Name);
-			ZIOX.Draw_Stat(area, 1, "Health", 	ZIOX.Draw_State, CurrentHP, MaxHP, true);
-			ZIOX.Draw_Stat(area, 2, "TU", 		ZIOX.Draw_State, CurrentTU, MaxTU, true);
-			ZIOX.Draw_Stat(area, 3, "Crouch",	IsSitting.ToString());
+			ZIOX.Draw_Stat(area, 1, "Health", 	ZIOX.Draw_State, Stats.CurrentHP, Stats.MaxHP, true);
+			ZIOX.Draw_Stat(area, 2, "TU", 		ZIOX.Draw_State, Stats.CurrentTU, Stats.MaxTU, true);
+			ZIOX.Draw_Stat(area, 3, "Crouch",	Position.IsSitting.ToString());
 			
 			ZIOX.Draw_Stat(area, 5, "In hands",	CurrentItem.Name);
 			
-			ZBuffer.WriteBuffer("TargetInfoBuffer", Config.TargetInfoAreaSizeX.Min, Config.TargetInfoAreaSizeY.Min);
+			ZBuffer.WriteBuffer("TargetInfoBuffer", UIConfig.TargetInfoRect.Left, UIConfig.TargetInfoRect.Top);
 			ZIOX.OutputType = ZIOX.OutputTypeEnum.Direct;
 		}		
-
-		#endregion
-
-		#region Constructors
-		
-		public Unit(string name, int xPos, int yPos)
-		{
-			Name = name;
-			XPos = xPos;
-			YPos = yPos;
-		}
 
 		#endregion		
 	}

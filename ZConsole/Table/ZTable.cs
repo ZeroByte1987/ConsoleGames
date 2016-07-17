@@ -111,7 +111,7 @@
 		private static void putFrameIntoBuffer(Node[,] buffer, Rect dimensions, FrameBorders borders, ZCharAttribute? borderColors, ZCharAttribute? fillColors)
 		{
 			currentBuffer = buffer;
-			
+
 			fillColors = fillColors ?? new ZCharAttribute();
 			var node = new Node{ Colors = fillColors.Value, NodeEnumItem = NodeEnum.None };
 			for (var i = dimensions.Top+1; i < dimensions.Bottom; i++)

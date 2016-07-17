@@ -34,18 +34,44 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ASCII_Tactics_Game.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="Config\GameConfig.cs" />
+    <Compile Include="Config\UIConfig.cs" />
+    <Compile Include="Config\MapConfig.cs" />
     <Compile Include="Logic\Extensions\ItemExtensions.cs" />
+    <Compile Include="Logic\Extensions\TileSetExtensions.cs" />
+    <Compile Include="Logic\Map\LevelsShowRoom.cs" />
+    <Compile Include="Logic\Map\LevelValidator.cs" />
+    <Compile Include="Logic\Map\MapGenerator.cs" />
+    <Compile Include="Logic\RNG.cs" />
+    <Compile Include="Logic\Utils.cs" />
+    <Compile Include="Logic\View\RecursionFOV.cs" />
     <Compile Include="Logic\ZIOX.cs" />
     <Compile Include="Logic\MainGame.cs" />
     <Compile Include="Logic\ViewLogic.cs" />
+    <Compile Include="Models\CommonEnums\Side.cs" />
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\Items\Ammo.cs" />
     <Compile Include="Models\Items\Inventory.cs" />
     <Compile Include="Models\Items\ItemTypes.cs" />
     <Compile Include="Models\Items\Weapon.cs" />
+    <Compile Include="Models\Map\ActiveObject.cs" />
+    <Compile Include="Models\Map\Locker.cs" />
+    <Compile Include="Models\Map\Door.cs" />
+    <Compile Include="Models\Map\Furniture.cs" />
+    <Compile Include="Models\Map\ItemOnFloor.cs" />
+    <Compile Include="Models\Map\Room.cs" />
+    <Compile Include="Models\Map\Level.cs" />
+    <Compile Include="Models\Map\SpaceStation.cs" />
     <Compile Include="Models\Team.cs" />
+    <Compile Include="Models\CommonEnums\ObjectSize.cs" />
+    <Compile Include="Models\Tiles\TileRole.cs" />
+    <Compile Include="Models\Tiles\Tile.cs" />
+    <Compile Include="Models\CommonEnums\ObjectHeight.cs" />
+    <Compile Include="Models\Tiles\TileType.cs" />
     <Compile Include="Models\Unit.cs" />
+    <Compile Include="Models\UnitData\Position.cs" />
+    <Compile Include="Models\UnitData\UnitStats.cs" />
+    <Compile Include="Models\UnitData\ViewStats.cs" />
     <Compile Include="NewEngine.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -69,9 +95,7 @@
   <ItemGroup>
     <Reference Include="System" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Models\Map\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

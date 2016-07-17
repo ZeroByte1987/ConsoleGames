@@ -23,14 +23,16 @@
 					unit.Id = i;
 					break;
 				}
-		
-			if (unit.InitialMaxTU == 0) unit.InitialMaxTU = 50;
-			if (unit.Accuracy == 0)		unit.InitialAccuracy = 50;
-			if (unit.Strength == 0)		unit.Strength = 50;
-			if (unit.MaxHP == 0)		unit.MaxHP = 50;
 
-			unit.CurrentHP = unit.MaxHP;
-			unit.CurrentTU = unit.MaxTU;
+			var stats = unit.Stats;
+
+			if (stats.TU == 0)	stats.TU = 50;
+			if (stats.Accuracy == 0)	stats.Accuracy = 50;
+			if (stats.Strength == 0)	stats.Strength = 50;
+			if (stats.MaxHP == 0)			stats.MaxHP = 50;
+
+			stats.CurrentHP = stats.MaxHP;
+			stats.CurrentTU = stats.MaxTU;
 			unit.Team = this;
 
 			Units.Add(unit);

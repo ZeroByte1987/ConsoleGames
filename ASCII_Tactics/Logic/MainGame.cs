@@ -2,19 +2,27 @@
 {
 	using System;
 	using System.Collections.Generic;
+	using Config;
 	using Extensions;
+	using Map;
 	using Models;
 	using Models.Items;
+	using Models.Map;
+	using Models.Tiles;
+	using Models.UnitData;
+	using View;
 	using ZConsole;
 	using ZConsole.LowLevel;
-	using ZConsole.Table;
 	using ZLinq;
 
 
 	public class MainGame
 	{
 		public static List<Team>	Teams;
-		public static ItemTypes	ItemTypes;
+		public static ItemTypes		ItemTypes;
+		public static SpaceStation	SpaceStation;
+
+		public bool ExitFlag = false;
 
 		public int CurrentTeamIndex = 0;
 		public int CurrentUnitIndex = 0;
@@ -25,16 +33,7 @@
 
 		public void		DrawUI()
 		{
-			ZTable.DrawTable(0, 0, new Table(Config.WindowSizeX, Config.WindowSizeY)
-				{
-					Borders = new FrameBorders(FrameType.Double),
-					BorderColors = new ZCharAttribute(Color.Cyan, Color.Black),
-					Cells = new []
-						{
-							new Cell(Config.GameAreaSizeX.Max+1,  0, Config.WindowSizeX, 30),
-							new Cell(Config.GameAreaSizeX.Max+1, 30, Config.WindowSizeX, Config.WindowSizeY)
-						}
-				});
+			ZTable.DrawTable(UIConfig.UIAreaRect.Left, UIConfig.UIAreaRect.Top, UIConfig.UITable);
 		}
 
 		public void		InitializeItems()
@@ -52,19 +51,26 @@
 
 		public void		InitializeGame()
 		{
+			RNG.Initialize();
+			SpaceStation = MapGenerator.CreateSpaceStation();
+
 			ZConsoleMain.ClearScreen();
 			InitializeItems();
 			DrawUI();
 
 			Teams = new List<Team>();
 			var playerTeam = new Team("X-COM Squad", true);
-			playerTeam.Add(new Unit("John", 40, 20)
+			playerTeam.Add(new Unit("John", 0, 40, 20)
 				{
-					InitialAccuracy = 50,
-					Strength = 50,
-					InitialMaxTU = 50,
-					MaxHP = 50,
-					View = ViewLogic.Initialize(Config.DefaultViewWidth, 4, Config.DefaultViewDistance),
+					Stats = new UnitStats
+						{
+							Accuracy = 50,
+							Strength = 50,
+							TU = 500,
+							MaxHP = 50
+						},
+					
+					View = ViewLogic.Initialize(GameConfig.DefaultViewWidth, 4, GameConfig.DefaultViewDistance),
 					Inventory = new Inventory
 						{
 							ItemTypes["Rifle"].Copy(),
@@ -76,13 +82,17 @@
 						}
 				});
 
-			playerTeam.Add(new Unit("Dave", 40, 25)
+			playerTeam.Add(new Unit("Dave", 0, 40, 25)
 				{
-					InitialAccuracy = 70,
-					Strength = 30,
-					InitialMaxTU = 45,
-					MaxHP = 40,
-					View = ViewLogic.Initialize(Config.DefaultViewWidth, 7, Config.DefaultViewDistance),
+					Stats = new UnitStats
+						{
+							Accuracy = 70,
+							Strength = 30,
+							TU = 450,
+							MaxHP = 40
+						},
+
+					View = ViewLogic.Initialize(GameConfig.DefaultViewWidth, 7, GameConfig.DefaultViewDistance),
 					Inventory = new Inventory
 						{
 							ItemTypes["Pistol"].Copy(),
@@ -96,34 +106,35 @@
 		}
 
 
-		public void		MainGameLoop()
+		public void		Test()
 		{
-			var exitFlag = false;
+			var time = DateTime.Now;
 
-			while (!exitFlag)
+			for (var i = 0; i < 100; i++)
 			{
 				CurrentUnit.Draw();
+			}
+			var ms = (DateTime.Now - time).TotalMilliseconds;
+			var n = ms;
 
-				var input = ZInput.ReadInput();
+			// 1900
+		}
+
+
+		public void		MainGameLoop()
+		{
+			CurrentUnit.Draw();
+
+			Test();
+
+			while (!ExitFlag)
+			{
+				var input = ZInput.WaitForInput();
 				var key = input.KeyEvent;
 
 				if (input.EventType == ConsoleInputEventType.KeyEvent  &&  key.IsKeyDown)
 				{
-					switch (key.VirtualKeyCode)
-					{
-						case ConsoleKey.Escape		:	exitFlag = true;				break;
-						case ConsoleKey.LeftArrow	:	CurrentUnit.TurnLeft();			break;
-						case ConsoleKey.RightArrow	:	CurrentUnit.TurnRight();		break;
-						case ConsoleKey.UpArrow		:	CurrentUnit.Move(1);			break;
-						case ConsoleKey.DownArrow	:	CurrentUnit.Move(-1);			break;
-						case ConsoleKey.PageDown	:	CurrentUnit.ChangeState(true);	break;
-						case ConsoleKey.PageUp		:	CurrentUnit.ChangeState(false);	break;
-						case ConsoleKey.Enter		:	DoAction();						break;
-
-						case ConsoleKey.Tab			:	
-							CurrentUnit.Draw();
-							CurrentUnitIndex = CurrentUnitIndex < CurrentTeam.Units.Count-1 ? CurrentUnitIndex + 1 : 0;	break;
-					}
+					ProcessKeyEvent(input.KeyEvent);
 				}
 
 				if (input.EventType == ConsoleInputEventType.MouseEvent)
@@ -134,15 +145,37 @@
 		}
 
 
+		private void	ProcessKeyEvent(ConsoleKeyEventInfo key)
+		{
+			switch (key.VirtualKeyCode)
+			{
+				case ConsoleKey.Escape		:	ExitFlag = true;				break;
+				case ConsoleKey.LeftArrow	:	CurrentUnit.TurnLeft();			break;
+				case ConsoleKey.RightArrow	:	CurrentUnit.TurnRight();		break;
+				case ConsoleKey.UpArrow		:	CurrentUnit.Move(1);			break;
+				case ConsoleKey.DownArrow	:	CurrentUnit.Move(-1);			break;
+				case ConsoleKey.PageDown	:	CurrentUnit.ChangeState(true);	break;
+				case ConsoleKey.PageUp		:	CurrentUnit.ChangeState(false);	break;
+				case ConsoleKey.Enter		:	DoTargetAction();				break;
+				case ConsoleKey.E			:	CurrentUnit.DoAction();			break;
+
+				case ConsoleKey.Tab			:	
+					CurrentUnit.Draw();
+					CurrentUnitIndex = CurrentUnitIndex < CurrentTeam.Units.Count-1 ? CurrentUnitIndex + 1 : 0;	break;
+			}
+
+			CurrentUnit.Draw();
+		}
+
 		private void	ProcessMouseEvent(ConsoleMouseEventInfo mouse)
 		{
 			HideTargetInfo();
 			for (var i = 0; i < CurrentTeam.Units.Count; i++)
 			{
 				var unit = CurrentTeam.Units[i];
-				if (unit.XPos == mouse.MousePosition.X-1  &&  unit.YPos == mouse.MousePosition.Y-1)
+				if (unit.Position.X == mouse.MousePosition.X  &&  unit.Position.Y == mouse.MousePosition.Y)
 				{
-					unit.DrawTargetInfo();
+					unit.DrawInfoAsTarget();
 				}
 			}
 
@@ -152,10 +185,10 @@
 				for (var i = 0; i < CurrentTeam.Units.Count; i++)
 				{
 					var unit = CurrentTeam.Units[i];
-					if (unit.XPos == mouse.MousePosition.X-1  &&  unit.YPos == mouse.MousePosition.Y-1)
+					if (unit.Position.X == mouse.MousePosition.X  &&  unit.Position.Y == mouse.MousePosition.Y)
 					{
-						CurrentUnit.Draw();
 						CurrentUnitIndex = i;
+						CurrentUnit.Draw();
 					}
 				}
 			}
@@ -163,22 +196,29 @@
 			//	Select a target
 			if (mouse.ButtonState == ConsoleMouseButtonState.RightButtonPressed)
 			{
+				ViewLogic.DrawRay = true;
+				CurrentUnit.View.IsRayPossible(
+					CurrentUnit.CurrentLevel, CurrentUnit.Position.X, CurrentUnit.Position.Y, 
+					mouse.MousePosition.X, mouse.MousePosition.Y, CurrentUnit.Position.IsSitting);
+				ViewLogic.DrawRay = false;
+
+
 				for (var i = 0; i < CurrentTeam.Units.Count; i++)
 				{
 					var unit = CurrentTeam.Units[i];
-					if (unit.XPos == mouse.MousePosition.X-1  &&  unit.YPos == mouse.MousePosition.Y-1)
+					if (unit.Position.X == mouse.MousePosition.X  &&  unit.Position.Y == mouse.MousePosition.Y)
 					{
-						Shoot(new Coord(unit.XPos, unit.YPos));
+						Shoot(unit.Position);
 					}
 				}
 			}
 		}
 
-		public void		DoAction()
+		public void		DoTargetAction()
 		{
 			var exitFlag = false;
 
-			var target = new Coord(CurrentUnit.XPos, CurrentUnit.YPos);
+			var target = CurrentUnit.Position;
 			DrawTargetMark(target, true);
 
 			while (!exitFlag)
@@ -225,7 +265,7 @@
 				CurrentUnit.DrawVisibleUnits();
 				ZIOX.OutputType = ZIOX.OutputTypeEnum.Direct;
 				
-				ZBuffer.WriteBuffer("defaultBuffer", Config.GameAreaSizeX.Min, Config.GameAreaSizeY.Min);
+				ZBuffer.WriteBuffer("defaultBuffer", UIConfig.GameAreaRect.Left, UIConfig.GameAreaRect.Top);
 				ZBuffer.SaveBuffer("defaultBuffer", buffer);
 			}
 			else
@@ -236,8 +276,8 @@
 
 		private void	MoveTarget(Coord target, int dx, int dy)
 		{
-			if (target.X + dx >= Config.GameAreaSizeX.Min  &&  target.X + dx < Config.GameAreaSizeX.Max-1
-			&&  target.Y + dy >= Config.GameAreaSizeY.Min  &&  target.Y + dy < Config.GameAreaSizeY.Max-1)
+			if (target.X + dx >= UIConfig.GameAreaRect.Left  &&  target.X + dx <= UIConfig.GameAreaRect.Right
+			&&  target.Y + dy >= UIConfig.GameAreaRect.Top   &&  target.Y + dy <= UIConfig.GameAreaRect.Bottom)
 			{
 				target.X += dx;
 				target.Y += dy;
@@ -248,14 +288,14 @@
 		{
 			foreach (var team in Teams)
 				foreach (var unit in team.Units.Where(a => a.Name != CurrentUnit.Name))
-					if (target.X == unit.XPos  &&  target.Y == unit.YPos)
+					if (target.Equals(unit.Position))
 						return true;
 			return false;
 		}
 
 		private void	HideTargetInfo()
 		{
-			ZOutput.FillRect(Config.TargetInfoAreaSizeX.Min, Config.TargetInfoAreaSizeY.Min, Config.TargetInfoAreaSizeX.RangeValue-1, Config.TargetInfoAreaSizeY.RangeValue-1, ' ');
+			ZOutput.FillRect(UIConfig.TargetInfoRect, ' ');
 		}
 
 
@@ -269,7 +309,7 @@
 				var ammo = unit.Inventory.First(item => item.Name == currentItem.Name + " Ammo").AsAmmo();
 				var weapon = currentItem.AsWeapon();
 
-				if (ammo.Amount > 0  &&  unit.CurrentTU >= weapon.Time_SnapShot)
+				if (ammo.Amount > 0  &&  unit.Stats.CurrentTU >= weapon.Time_SnapShot)
 				{
 				}
 			}
