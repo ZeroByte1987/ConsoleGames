@@ -4,21 +4,29 @@
 	using System.Runtime.InteropServices;
 
 	/// <summary>
-    /// Reports keyboard events in a console input record.
-    /// </summary>
- 	[StructLayout(LayoutKind.Explicit)]
-	public struct		ConsoleKeyEventInfo
-	{ 
-		[FieldOffset(0)] private	int		bKeyDown;
-		[FieldOffset(4)] private	short	wRepeatCount;
-		[FieldOffset(6)] private	short	wVirtualKeyCode;
-		[FieldOffset(8)] private	short	wVirtualScanCode;
-		[FieldOffset(10)]private	char	cUnicodeChar;
-		[FieldOffset(10)]private	short	wUnicodeChar;
-		[FieldOffset(10)]private	byte	bAsciiChar;
-		[FieldOffset(12)]private	int		dwControlKeyState;
+	/// Reports keyboard events in a console input record.
+	/// </summary>
+	[StructLayout(LayoutKind.Explicit)]
+	public struct ConsoleKeyEventInfo
+	{
+		[FieldOffset(0)] private int bKeyDown;
+		[FieldOffset(4)] private short wRepeatCount;
+		[FieldOffset(6)] private short wVirtualKeyCode;
+		[FieldOffset(8)] private short wVirtualScanCode;
+		[FieldOffset(10)] private char cUnicodeChar;
+		[FieldOffset(10)] private short wUnicodeChar;
+		[FieldOffset(10)] private byte bAsciiChar;
+		[FieldOffset(12)] private int dwControlKeyState;
 
-        /// <summary>
+		public bool			IsAltPressed	{ get { return  (ControlKeyState & ConsoleControlKeyState.LeftAltPressed) != 0  ||
+															(ControlKeyState & ConsoleControlKeyState.RightAltPressed) != 0;  }}
+
+		public bool			IsCtrlPressed	{ get { return  (ControlKeyState & ConsoleControlKeyState.LeftCtrlPressed) != 0 ||
+															(ControlKeyState & ConsoleControlKeyState.RightCtrlPressed) != 0;  }}
+
+		public bool			IsShiftPressed	{ get { return  (ControlKeyState & ConsoleControlKeyState.ShiftPressed) != 0;  }}
+
+		/// <summary>
         /// Gets or sets a value indicating whether this is a key down or key up event.
         /// </summary>
 		public bool			IsKeyDown

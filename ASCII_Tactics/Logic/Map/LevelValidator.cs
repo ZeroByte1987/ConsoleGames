@@ -66,15 +66,9 @@
 		private static bool		IsLevelPassable(int[,] map)
 		{
 			for (var i = 0; i < MapConfig.LevelSize.Height; i++)
-			{
 				for (var j = 0; j < MapConfig.LevelSize.Width; j++)
-				{
 					if (map[i,j] == EmptyColor)
-					{
 						return false;
-					}
-				}
-			}
 			return true;
 		}
 	}

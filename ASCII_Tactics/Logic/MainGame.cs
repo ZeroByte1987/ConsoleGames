@@ -8,9 +8,7 @@
 	using Models;
 	using Models.Items;
 	using Models.Map;
-	using Models.Tiles;
 	using Models.UnitData;
-	using View;
 	using ZConsole;
 	using ZConsole.LowLevel;
 	using ZLinq;
@@ -150,12 +148,16 @@
 			switch (key.VirtualKeyCode)
 			{
 				case ConsoleKey.Escape		:	ExitFlag = true;				break;
-				case ConsoleKey.LeftArrow	:	CurrentUnit.TurnLeft();			break;
-				case ConsoleKey.RightArrow	:	CurrentUnit.TurnRight();		break;
-				case ConsoleKey.UpArrow		:	CurrentUnit.Move(1);			break;
+				
+				case ConsoleKey.LeftArrow	:	if (key.IsAltPressed) CurrentUnit.Strafe(-1); else CurrentUnit.TurnLeft();	break;
+				case ConsoleKey.RightArrow	:	if (key.IsAltPressed) CurrentUnit.Strafe(+1); else CurrentUnit.TurnRight();	break;
+				
+				case ConsoleKey.UpArrow		:	CurrentUnit.Move(+1);			break;
 				case ConsoleKey.DownArrow	:	CurrentUnit.Move(-1);			break;
-				case ConsoleKey.PageDown	:	CurrentUnit.ChangeState(true);	break;
-				case ConsoleKey.PageUp		:	CurrentUnit.ChangeState(false);	break;
+
+				case ConsoleKey.PageDown	:	CurrentUnit.ChangeStandingState(true);	break;
+				case ConsoleKey.PageUp		:	CurrentUnit.ChangeStandingState(false);	break;
+				
 				case ConsoleKey.Enter		:	DoTargetAction();				break;
 				case ConsoleKey.E			:	CurrentUnit.DoAction();			break;
 
@@ -196,13 +198,6 @@
 			//	Select a target
 			if (mouse.ButtonState == ConsoleMouseButtonState.RightButtonPressed)
 			{
-				ViewLogic.DrawRay = true;
-				CurrentUnit.View.IsRayPossible(
-					CurrentUnit.CurrentLevel, CurrentUnit.Position.X, CurrentUnit.Position.Y, 
-					mouse.MousePosition.X, mouse.MousePosition.Y, CurrentUnit.Position.IsSitting);
-				ViewLogic.DrawRay = false;
-
-
 				for (var i = 0; i < CurrentTeam.Units.Count; i++)
 				{
 					var unit = CurrentTeam.Units[i];
@@ -262,7 +257,7 @@
 				ZIOX.Print(target.X-1, target.Y+1, (char)Tools.Get_Ascii_Byte('└'), targetColor);
 				ZIOX.Print(target.X+1, target.Y+1, (char)Tools.Get_Ascii_Byte('┘'), targetColor);
 
-				CurrentUnit.DrawVisibleUnits();
+				MapRender.DrawVisibleUnits(CurrentUnit);
 				ZIOX.OutputType = ZIOX.OutputTypeEnum.Direct;
 				
 				ZBuffer.WriteBuffer("defaultBuffer", UIConfig.GameAreaRect.Left, UIConfig.GameAreaRect.Top);

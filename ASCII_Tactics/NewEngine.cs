@@ -22,7 +22,7 @@
 		{
 			PrepareGraphicMode();
 
-			//LevelsShowRoom.ShowStation();
+//			LevelsShowRoom.ShowStation();
 
 			var mainGame = new MainGame();			
 			mainGame.InitializeGame();

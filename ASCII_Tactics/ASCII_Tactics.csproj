@@ -34,6 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ASCII_Tactics_Game.cs" />
+    <Compile Include="Config\ActionCostConfig.cs" />
     <Compile Include="Config\GameConfig.cs" />
     <Compile Include="Config\UIConfig.cs" />
     <Compile Include="Config\MapConfig.cs" />
@@ -42,12 +43,14 @@
     <Compile Include="Logic\Map\LevelsShowRoom.cs" />
     <Compile Include="Logic\Map\LevelValidator.cs" />
     <Compile Include="Logic\Map\MapGenerator.cs" />
+    <Compile Include="Logic\Map\MapRender.cs" />
     <Compile Include="Logic\RNG.cs" />
     <Compile Include="Logic\Utils.cs" />
     <Compile Include="Logic\View\RecursionFOV.cs" />
     <Compile Include="Logic\ZIOX.cs" />
     <Compile Include="Logic\MainGame.cs" />
     <Compile Include="Logic\ViewLogic.cs" />
+    <Compile Include="Models\CommonEnums\Visibility.cs" />
     <Compile Include="Models\CommonEnums\Side.cs" />
     <Compile Include="Models\Item.cs" />
     <Compile Include="Models\Items\Ammo.cs" />

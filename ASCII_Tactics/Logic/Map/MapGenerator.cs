@@ -93,6 +93,9 @@
 
 		private static void			CreateRoom(Level level, IList<Rect> areas)
 		{
+			if (areas.Count == 0)
+				return;
+
 			var areaIndex = RNG.GetNumber(areas.Count);
 			var room = new Room(areas[areaIndex]);
 			areas.RemoveAt(areaIndex);
