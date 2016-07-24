@@ -2,6 +2,7 @@
 {
 	using System;
 	using System.Diagnostics;
+	using System.Runtime.InteropServices;
 	using System.Text;
 	using LowLevel;
 
@@ -91,6 +92,17 @@
 		public static void		ChangeConsoleCaption(string caption)
 		{
 			Console.Title = caption;
+		}
+
+		public static unsafe void	SetConsoleFont(string fontName, int xSize, int ySize)
+		{
+			var hnd = WinCon.GetStdHandle(WinCon.STD_OUTPUT_HANDLE);
+			var newInfo = new CONSOLE_FONT_INFO_EX { cbSize = 84, FontFamily = 48 };
+			var ptr = new IntPtr(newInfo.FaceName);
+			Marshal.Copy(fontName.ToCharArray(), 0, ptr, fontName.Length);
+			newInfo.dwFontSize = new CoordInternal(xSize, ySize);
+			newInfo.FontWeight = 400;
+			WinCon.SetCurrentConsoleFontEx(hnd, false, ref newInfo);
 		}
 	}
 }

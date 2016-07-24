@@ -277,6 +277,73 @@ namespace ZLinq
 		}
 
 		/// <summary>
+        /// Projects each element of a sequence to an <see cref="IEnumerable{T}" /> 
+        /// and flattens the resulting sequences into one sequence.
+        /// </summary>
+        public static IEnumerable<TResult> SelectMany<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, IEnumerable<TResult>> selector)
+        {
+            if (selector == null)
+				throw new ArgumentNullException("selector");
+
+            return source.SelectMany((item, i) => selector(item));
+        }
+
+        /// <summary>
+        /// Projects each element of a sequence to an <see cref="IEnumerable{T}" />, and flattens
+        /// the resulting sequences into one sequence. The index of each source element is used in the projected form of  that element.
+        /// </summary>
+        public static IEnumerable<TResult> SelectMany<TSource, TResult>(this IEnumerable<TSource> source, Func<TSource, int, IEnumerable<TResult>> selector)
+        {
+            if (selector == null)
+				throw new ArgumentNullException("selector");
+
+            return source.SelectMany(selector, (item, subitem) => subitem);
+        }
+
+        /// <summary>
+        /// Projects each element of a sequence to an <see cref="IEnumerable{T}" />, flattens the resulting sequences
+        /// into one sequence, and invokes a result selector function on each element therein.
+        /// </summary>
+        public static IEnumerable<TResult> SelectMany<TSource, TCollection, TResult>(
+            this IEnumerable<TSource> source,
+            Func<TSource, IEnumerable<TCollection>> collectionSelector,
+            Func<TSource, TCollection, TResult> resultSelector)
+        {
+            if (collectionSelector == null)
+				throw new ArgumentNullException("collectionSelector");
+
+            return source.SelectMany((item, i) => collectionSelector(item), resultSelector);
+        }
+
+        /// <summary>
+        /// Projects each element of a sequence to an <see cref="IEnumerable{T}" />, flattens the resulting sequences
+        /// into one sequence, and invokes a result selector function on each element therein. The index of each source
+        /// element is used in the intermediate projected form of that element.
+        /// </summary>
+        public static IEnumerable<TResult> SelectMany<TSource, TCollection, TResult>(
+            this IEnumerable<TSource> source,
+            Func<TSource, int, IEnumerable<TCollection>> collectionSelector,
+            Func<TSource, TCollection, TResult> resultSelector)
+        {
+            if (source == null) throw new ArgumentNullException("source");
+            if (collectionSelector == null) throw new ArgumentNullException("collectionSelector");
+            if (resultSelector == null) throw new ArgumentNullException("resultSelector");
+
+            return SelectManyYield(source, collectionSelector, resultSelector);
+        }
+
+        private static IEnumerable<TResult> SelectManyYield<TSource, TCollection, TResult>(
+            this IEnumerable<TSource> source,
+            Func<TSource, int, IEnumerable<TCollection>> collectionSelector,
+            Func<TSource, TCollection, TResult> resultSelector)
+        {
+            var i = 0;
+            foreach (var item in source)
+                foreach (var subitem in collectionSelector(item, i++))
+                    yield return resultSelector(item, subitem);
+        }
+
+		/// <summary>
 		/// Base implementation of First operator.
 		/// </summary>
 		private static TSource FirstImpl<TSource>(this IEnumerable<TSource> source, Func<TSource> empty)
@@ -961,30 +1028,6 @@ namespace ZLinq
 		{
 			public Key(T value) : this() { Value = value; }
 			public T Value { get; private set; }
-		}
-
-		/// <remarks>
-		/// This type is not intended to be used directly from user code.
-		/// It may be removed or changed in a future version without notice.
-		/// </remarks>
-		sealed class KeyComparer<T> : IEqualityComparer<Key<T>>
-		{
-			private readonly IEqualityComparer<T> _innerComparer;
-
-			public KeyComparer(IEqualityComparer<T> innerComparer)
-			{
-				_innerComparer = innerComparer ?? EqualityComparer<T>.Default;
-			}
-
-			public bool Equals(Key<T> x, Key<T> y)
-			{
-				return _innerComparer.Equals(x.Value, y.Value);
-			}
-
-			public int GetHashCode(Key<T> obj)
-			{
-				return obj.Value == null ? 0 : _innerComparer.GetHashCode(obj.Value);
-			}
 		}
 	}
 }

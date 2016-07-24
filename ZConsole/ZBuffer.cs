@@ -16,6 +16,14 @@
 				throw new Exception("Cannot find buffer with specified name: " + bufferName + ".");
 		}
 
+		public static void		ClearBuffer(string bufferName)
+		{
+			CheckBuffer(bufferName);
+			var buffer = buffers[bufferName];
+			buffer = new ZCharInfo[buffer.GetLength(0), buffer.GetLength(1)];
+			SaveBuffer(bufferName, buffer);
+		}
+
 		public static void		ReadBuffer(string bufferName, Rect rect)
 		{
 			ReadBuffer(bufferName, 0, 0, rect.Left, rect.Top, rect.Right, rect.Bottom);

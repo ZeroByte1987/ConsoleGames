@@ -1,4 +1,4 @@
-﻿namespace ASCII_Tactics.Logic.Map
+﻿namespace ASCII_Tactics.Logic.Render
 {
 	using Config;
 	using Models;
@@ -66,8 +66,11 @@
 		{
 			foreach (var team in MainGame.Teams)
 				foreach (var target in team.Units.Where(a => a.Name != unit.Name))
-					if (unit.View.IsUnitVisible(unit.CurrentLevel, unit.Position, target.Position) == Visibility.Full)
+					if ((unit.Team.Name == target.Team.Name  &&  unit.Position.LevelId == target.Position.LevelId)  ||
+						unit.View.IsUnitVisible(unit.CurrentLevel, unit.Position, target.Position) == Visibility.Full)
+					{
 						ZIOX.Print(target.Position.X, target.Position.Y, "@", (team.Name == unit.Team.Name) ? Color.Magenta : Color.Red);
+					}
 		}
 	}
 }

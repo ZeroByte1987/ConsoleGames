@@ -1,11 +1,10 @@
 ﻿namespace ASCII_Tactics.Models
 {
-	using System;
+	using CommonEnums;
 	using Config;
 	using Items;
 	using Logic;
-	using Logic.Extensions;
-	using Logic.Map;
+	using Logic.Render;
 	using Map;
 	using Tiles;
 	using UnitData;
@@ -15,14 +14,13 @@
 
 	public class Unit
 	{
-		public int			Id				{ get; set; }
 		public string		Name			{ get; set; }
 		
 		public Position		Position		{ get; set; }
 		public UnitStats	Stats			{ get; set; }
 
 		public Inventory	Inventory		{ get; set; }
-		public Item			CurrentItem		{ get { return Inventory.CurrentItem; }}
+		public Item			ActiveItem		{ get { return Inventory.ActiveItem; }}
 
 		public ViewLogic	View			{ get; set; }
 		public Level		CurrentLevel	{ get { return MainGame.SpaceStation.Levels.SingleOrDefault(w => w.Id == Position.LevelId); }}
@@ -35,23 +33,20 @@
 			Name		= name;
 			Position	= new Position(levelId, xPos, yPos);
 		}
+		public Unit(string name) : this(name, 0, 0, 0)
+		{
+		}
 
-
-		#region Public Methods
 
 		public bool		Move(int dx, int dy)
 		{
-			var moveTimeCost = Math.Abs(dx+dy) == 1 ? ActionCostConfig.Move : ActionCostConfig.MoveDiagonal;
-			if (Position.IsSitting)
-			{
-				moveTimeCost *= ActionCostConfig.CrouchFactor;
-			}
-
+			var moveTimeCost = TimeCost.GetTimeCostForMove(dx, dy, Position.IsSitting, View);
 			if (Stats.CurrentTU < moveTimeCost)
 				return false;
-			
-			var newPosX = Position.X + dx;
-			var newPosY = Position.Y + dy;
+
+			var moveDirection = View.GetAbsoluteMoveDirection(dx, dy);
+			var newPosX = Position.X + moveDirection.X;
+			var newPosY = Position.Y + moveDirection.Y;
 
 			if (!CurrentLevel.Map[newPosY, newPosX].Type.IsPassable)
 				return false;
@@ -67,10 +62,6 @@
 			return true;
 		}
 
-		public bool		Move(int dx)
-		{
-			return Move(View.DX*dx, View.DY*dx);
-		}
 
 		public void		TurnLeft()
 		{
@@ -80,31 +71,10 @@
 				Stats.CurrentTU -= ActionCostConfig.Turn;
 			}
 		}
-
-		public void		Strafe(int dx)
-		{
-			if (Stats.CurrentTU > ActionCostConfig.StrafePenalty + ActionCostConfig.MoveDiagonal)
-			{
-				if  (dx == -1)
-				{
-					View.TurnLeft(2);
-					Move(1);
-					View.TurnRight(2);
-				}
-				if  (dx == 1)
-				{
-					View.TurnRight(2);
-					Move(1);
-					View.TurnLeft(2);
-				}
-				
-				Stats.CurrentTU -= ActionCostConfig.StrafePenalty;
-			}
-		}
 		
 		public void		TurnRight()
 		{
-			if (Stats.CurrentTU > ActionCostConfig.Turn)
+			if (Stats.CurrentTU >= ActionCostConfig.Turn)
 			{
 				View.TurnRight();
 				Stats.CurrentTU -= ActionCostConfig.Turn;
@@ -124,17 +94,36 @@
 
 		public void		DoAction()
 		{
-			var tile = CurrentLevel.Map[Position.Y + View.DY, Position.X + View.DX];
+			var xPos = Position.X + View.DX;
+			var yPos = Position.Y + View.DY;
+			var tile = CurrentLevel.Map[yPos, xPos];
 
 			if (tile.Type.Role == TileRole.Door)
 			{
 				if (Stats.CurrentTU >= ActionCostConfig.OpenCloseDoor)
 				{
-					CurrentLevel.Map[Position.Y + View.DY, Position.X + View.DX] = tile.Type.Name == "OpenedDoor"
+					CurrentLevel.Map[yPos, xPos] = tile.Type.Name == "OpenedDoor"
 						? new Tile("ClosedDoor")
 						: new Tile("OpenedDoor");
 
 					Stats.CurrentTU -= ActionCostConfig.OpenCloseDoor;
+				}
+			}
+
+			if (tile.Type.Role == TileRole.Target)
+			{
+				MainGame.CurrentGameState = GameState.GameIsWon;
+				return;
+			}
+
+			tile = CurrentLevel.Map[Position.Y, Position.X];
+			if (tile.Type.Role == TileRole.Stairs)
+			{
+				var delta = tile.Type.Name == "StairsUp" ? -1 : 1;
+				if (Stats.CurrentTU >= ActionCostConfig.UseStairs)
+				{
+					Position.LevelId += delta;
+					Stats.CurrentTU -= ActionCostConfig.UseStairs;
 				}
 			}
 		}
@@ -151,51 +140,9 @@
 			ZBuffer.PrintToBuffer(Position.X, Position.Y, '@', Color.Yellow);
 			ZBuffer.WriteBuffer("defaultBuffer", UIConfig.GameAreaRect.Left, UIConfig.GameAreaRect.Top);
 			
-			DrawInfo();
+			InfoRender.DrawUnitInfo(this);
 
 			ZIOX.OutputType = ZIOX.OutputTypeEnum.Direct;
 		}
-
-
-		public void		DrawInfo()
-		{
-			ZIOX.BufferName = "InfoBuffer";
-			var area = UIConfig.UnitStatsArea;
-			
-			ZIOX.Draw_Stat(area, 0, "Name",		Name);
-			ZIOX.Draw_Stat(area, 1, "Health", 	ZIOX.Draw_State, Stats.CurrentHP, Stats.MaxHP, true);
-			ZIOX.Draw_Stat(area, 2, "TU", 		ZIOX.Draw_State, Stats.CurrentTU, Stats.MaxTU, true);
-			ZIOX.Draw_Stat(area, 3, "Crouch",	Position.IsSitting.ToString());
-			ZIOX.Draw_Stat(area, 5, "Accuracy",	Stats.CurrentAccuracy);
-			ZIOX.Draw_Stat(area, 6, "Strength",	Stats.CurrentStrength);
-			
-			ZIOX.Draw_Stat(area, 8, "In hands",	CurrentItem.Name);
-			var ammo = Inventory.First(item => item.Name == CurrentItem.Name + " Ammo");
-			ZIOX.Draw_Stat(area, 9, "Ammo",	ammo.AsAmmo().Amount);
-
-			Inventory.Draw(area, 11);			
-			
-			ZBuffer.WriteBuffer("InfoBuffer", UIConfig.UnitInfoRect.Left, UIConfig.UnitInfoRect.Top);
-		}
-
-		public void		DrawInfoAsTarget()
-		{
-			ZIOX.OutputType = ZIOX.OutputTypeEnum.Buffer;
-			ZIOX.BufferName = "TargetInfoBuffer";
-			var area = UIConfig.UnitStatsArea;
-			
-			ZIOX.Draw_Stat(area, 0, "Name",		Name);
-			ZIOX.Draw_Stat(area, 1, "Health", 	ZIOX.Draw_State, Stats.CurrentHP, Stats.MaxHP, true);
-			ZIOX.Draw_Stat(area, 2, "TU", 		ZIOX.Draw_State, Stats.CurrentTU, Stats.MaxTU, true);
-			ZIOX.Draw_Stat(area, 3, "Crouch",	Position.IsSitting.ToString());
-			ZIOX.Draw_Stat(area, 5, "Looks",	View.DirectionName);
-			
-			ZIOX.Draw_Stat(area, 7, "In hands",	CurrentItem.Name);
-			
-			ZBuffer.WriteBuffer("TargetInfoBuffer", UIConfig.TargetInfoRect.Left, UIConfig.TargetInfoRect.Top);
-			ZIOX.OutputType = ZIOX.OutputTypeEnum.Direct;
-		}		
-
-		#endregion		
 	}
 }

@@ -4,6 +4,7 @@
 	using System.Collections.Generic;
 	using System.Runtime.InteropServices;
 	using System.Text;
+	using LowLevel;
 
 
 	#region Public Enums
@@ -110,6 +111,11 @@
 			Y += dy;
 		}
 		public bool		Equals(Coord target)
+		{
+			return target.X == X  &&  target.Y == Y;
+		}
+
+		public bool		Equals(CoordInternal target)
 		{
 			return target.X == X  &&  target.Y == Y;
 		}

@@ -7,7 +7,7 @@
 	/// Reports keyboard events in a console input record.
 	/// </summary>
 	[StructLayout(LayoutKind.Explicit)]
-	public struct ConsoleKeyEventInfo
+	public struct		ConsoleKeyEventInfo
 	{
 		[FieldOffset(0)] private int bKeyDown;
 		[FieldOffset(4)] private short wRepeatCount;
@@ -273,6 +273,17 @@
 		public int		nFont;
 		public CoordInternal	dwFontSize;
     }
+
+	[StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+	public unsafe struct CONSOLE_FONT_INFO_EX
+	{
+		internal uint cbSize;
+		internal uint nFont;
+		internal CoordInternal dwFontSize;
+		internal int FontFamily;
+		internal int FontWeight;
+		internal fixed char FaceName[32];
+	}
 
 
 	/// <summary>

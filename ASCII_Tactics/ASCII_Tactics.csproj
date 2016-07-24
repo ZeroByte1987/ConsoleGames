@@ -35,27 +35,39 @@
   <ItemGroup>
     <Compile Include="ASCII_Tactics_Game.cs" />
     <Compile Include="Config\ActionCostConfig.cs" />
+    <Compile Include="Config\ItemConfig.cs" />
+    <Compile Include="Config\MonsterConfig.cs" />
     <Compile Include="Config\GameConfig.cs" />
+    <Compile Include="Config\SoldierConfig.cs" />
     <Compile Include="Config\UIConfig.cs" />
     <Compile Include="Config\MapConfig.cs" />
+    <Compile Include="Logic\Extensions\CommonExtensions.cs" />
     <Compile Include="Logic\Extensions\ItemExtensions.cs" />
     <Compile Include="Logic\Extensions\TileSetExtensions.cs" />
     <Compile Include="Logic\Map\LevelsShowRoom.cs" />
     <Compile Include="Logic\Map\LevelValidator.cs" />
     <Compile Include="Logic\Map\MapGenerator.cs" />
-    <Compile Include="Logic\Map\MapRender.cs" />
+    <Compile Include="Logic\Monsters\MonsterGenerator.cs" />
+    <Compile Include="Logic\Render\InfoRender.cs" />
+    <Compile Include="Logic\Render\MapRender.cs" />
     <Compile Include="Logic\RNG.cs" />
+    <Compile Include="Logic\Soldiers\TeamGenerator.cs" />
+    <Compile Include="Logic\TargetMark.cs" />
+    <Compile Include="Logic\TimeCost.cs" />
     <Compile Include="Logic\Utils.cs" />
     <Compile Include="Logic\View\RecursionFOV.cs" />
     <Compile Include="Logic\ZIOX.cs" />
     <Compile Include="Logic\MainGame.cs" />
     <Compile Include="Logic\ViewLogic.cs" />
+    <Compile Include="Models\CommonEnums\GameState.cs" />
+    <Compile Include="Models\CommonEnums\Corner.cs" />
+    <Compile Include="Models\CommonEnums\ItemClass.cs" />
     <Compile Include="Models\CommonEnums\Visibility.cs" />
     <Compile Include="Models\CommonEnums\Side.cs" />
-    <Compile Include="Models\Item.cs" />
+    <Compile Include="Models\Items\Item.cs" />
+    <Compile Include="Models\Items\ItemType.cs" />
     <Compile Include="Models\Items\Ammo.cs" />
     <Compile Include="Models\Items\Inventory.cs" />
-    <Compile Include="Models\Items\ItemTypes.cs" />
     <Compile Include="Models\Items\Weapon.cs" />
     <Compile Include="Models\Map\ActiveObject.cs" />
     <Compile Include="Models\Map\Locker.cs" />
@@ -82,10 +94,6 @@
     <ProjectReference Include="..\ZConsole\ZConsole.csproj">
       <Project>{e45a2faf-2d56-4ee8-8905-d3b079d14f5b}</Project>
       <Name>ZConsole</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ZFC\ZFC.csproj">
-      <Project>{E97B7EF6-30EC-4C1D-8E65-6B073D8F4BCF}</Project>
-      <Name>ZFC</Name>
     </ProjectReference>
     <ProjectReference Include="..\ZLinq\ZLinq.csproj">
       <Project>{e181fcaa-48a1-431e-a704-cab45b518e8a}</Project>

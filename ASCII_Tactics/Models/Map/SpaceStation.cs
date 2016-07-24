@@ -5,8 +5,8 @@
 
 	public class SpaceStation
 	{
-		public List<Level>			Levels	{ get; set; }
-		public List<ItemOnFloor>	Items	{ get; set; }
+		public List<Level>			Levels		{ get; set; }
+		public List<ItemOnFloor>	Items		{ get; set; }
 
 		public SpaceStation()
 		{

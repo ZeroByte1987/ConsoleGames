@@ -1,27 +1,16 @@
 ﻿namespace ASCII_Tactics.Models.Items
 {
-	using Logic;
+	using CommonEnums;
 
 
-	public class Ammo : Item
+	public class Ammo : ItemType
 	{
-		public int WeaponTypeId	{ get; set; }
-
-		public int Amount		{ get; set; }
+		public string	WeaponName	{ get; set; }
 
 
-		public Ammo(string name, int weight, int weaponTypeId, int amount) : base(name, weight)
+		public Ammo(string name, string weaponName, int weight, int price = 0) : base(name, ItemClass.Ammo, weight, price)
 		{
-			WeaponTypeId = weaponTypeId;
-			Amount = amount;
-		}
-
-		public Ammo(string name, int weight, string weaponTypeName, int amount) : base(name, weight)
-		{
-			var weaponType = MainGame.ItemTypes.GetByKey(weaponTypeName);
-			if (weaponType != null)
-				WeaponTypeId = weaponType.ItemTypeId;
-			Amount = amount;
+			WeaponName = weaponName;
 		}
 	}
 }
